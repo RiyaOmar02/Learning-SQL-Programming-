@@ -1,4 +1,6 @@
-# For this project, I downloaded Spotify data from Kaggle. Then I created a table to insert Spotify data into. Finally, I performed analytics on the data using SQL. 
+# For this project, I downloaded Spotify data from Kaggle. 
+# Then I created a table to insert Spotify data into. 
+# Finally, I performed analytics on the data using SQL. 
 
 # I created the table for the data to import into: 
 
@@ -53,6 +55,23 @@ SELECT track_name, artist_name, ROUND(duration_ms / 1000 / 60) AS 'apprx_length(
 FROM spotifydata
 ORDER BY duration_ms desc
 
+
 # After exploring, I answered questions posed by others regarding the data. 
 
-# Q1 
+
+# Q1 Calculate the average popularity for the artists in the Spotify data table. 
+# Then, for every artist with an average popularity of 90 or above, show their name, 
+# their average popularity, and label them as a “Top Star”.
+
+WITH temptable AS (
+    SELECT artist_name, AVG(popularity) AS avg_pop
+    FROM spotifydata
+    GROUP BY artist_name
+        )
+SELECT artist_name, avg_pop, 'Top Star' AS tag
+FROM temptable
+WHERE avg_pop >= 90
+;
+
+
+# Q2 
