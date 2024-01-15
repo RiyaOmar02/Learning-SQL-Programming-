@@ -1,0 +1,164 @@
+# This is the SQL I used in completing the SQL Murder Mystery game from https://mystery.knightlab.com/
+
+# Locate Crime Report
+
+SELECT *
+FROM crime_scene_report
+WHERE date = 20180115
+AND type = 'murder'
+AND city LIKE '%SQL City%'
+;
+# ---2 witnesses
+# ------> 1st lives at the last house on "Northwestern Dr."
+# ------> 2nd named Annabel lives somewhere on "Franklin Ave"
+
+# Locate Witness: Annabel
+
+SELECT *
+FROM person
+WHERE name LIKE '%Annabel%' 
+AND address_street_name LIKE '%Franklin%'
+;
+# ------> Annabel Miller
+
+
+# Locate Witness: Num2
+
+SELECT *
+FROM person
+WHERE address_street_name LIKE '%Northwestern%'
+ORDER BY address_number DESC
+;
+#------> Morty Schapiro person.id 14887
+
+
+# Determine Person_ID
+
+SELECT *
+FROM get_fit_now_member
+WHERE name LIKE 'Annabel%' OR 'Morty%'
+;
+# -----> Annabel gym member person_id 16371
+
+
+# Annabel Witness Statement
+
+SELECT *
+FROM interview
+LEFT JOIN get_fit_now_member gym
+ON interview.person_id = gym.person_id
+WHERE gym.person_id = 16371
+;
+#------> she recognized murderer from her gym when she was working out Jan. 9
+
+
+# What is Annabel's gym number?
+
+SELECT id, name, person_id
+FROM get_fit_now_member
+WHERE name LIKE 'Annabel%'
+;
+#-------> 90081
+
+
+# Morty's Witness Statement
+
+SELECT *
+FROM interview
+LEFT JOIN person
+ON interview.person_id = person.id
+WHERE person.id = 14887
+;
+#------> heard gunshot and saw man run out. had Get Fit Gym bag. 
+#------> Membership started with "48Z" => gold member
+#------> got into car with plate that included "H42W"
+
+
+# Search for Murder Suspect
+
+# Who was at gym during Annabel's workout
+
+SELECT *
+FROM get_fit_now_check_in
+WHERE membership_id = 90081
+;
+#-----> Annabel at gym Jan 9 from 1600 to 1700
+
+SELECT *
+FROM get_fit_now_check_in
+WHERE check_in_date = 20180109
+AND check_in_time < 1700
+AND check_out_time > 1600
+AND membership_id <> 90081
+;
+#----->2 other gym members during Annabel's workout: 
+#----------> membership_id 48Z7A
+#----------> membership_id 48Z55
+
+# Who are these members?
+SELECT id, name, person_id
+FROM get_fit_now_member
+WHERE id = '48Z7A' 
+    OR id = '48Z55'
+;
+#------- 48Z7A is Joe Germuska person_id 28819
+#------- 48Z55 is Jeremy Bowers person_id 67318
+
+# Do either of them match the partial plate from Morty's statement?
+
+SELECT *
+FROM person
+LEFT JOIN drivers_license
+ON person.license_id = drivers_license.id
+WHERE person.name = 'Jeremy Bowers'
+;
+#-------> no license info
+
+SELECT *
+FROM person
+LEFT JOIN drivers_license
+ON person.license_id = drivers_license.id
+WHERE person.name = 'Jeremy Bowers'
+;
+#------> license palte 0H42W2
+
+
+# Murderer = Jeremy Bowers!
+
+# Congrats, you found the murderer! But wait, there's more... 
+# If you think you're up for a challenge, try querying the interview transcript of the 
+# murderer to find the real villain behind this crime. If you feel especially confident 
+# in your SQL skills, try to complete this final step with no more than 2 queries. 
+# Use this same INSERT statement with your new suspect to check your answer.
+
+# Jeremy's Statement
+
+SELECT *
+FROM interview
+LEFT JOIN person
+ON interview.person_id = person.id
+WHERE person.name = 'Jeremy Bowers'
+;
+#------> hired by a woman with a lot of money
+#------> woman is 5'5" (65") to 5'7" (67"), has red hair, and drives a Tesla ModelS
+#------> attended the SQL Symphony Concert three times in December 2017
+
+SELECT *
+FROM person
+WHERE license_id IN (
+    SELECT id
+    FROM drivers_license
+    WHERE hair_color = 'red'
+    AND car_make = 'Tesla'
+    AND car_model = 'Model S'
+    AND height BETWEEN 65 AND 67)
+AND id IN (
+  SELECT person_id
+  FROM facebook_event_checkin
+  WHERE event_name LIKE 'SQL Symphony Concert')
+  ;
+
+# Real Mastermind = Mirandy Priestly!
+
+# Congrats, you found the brains behind the murder! Everyone in SQL City hails you 
+# as the greatest SQL detective of all time. Time to break out the champagne!
