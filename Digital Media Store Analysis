@@ -37,4 +37,14 @@ WHERE i.billingcountry = 'Brazil'
 ;
 
 
-# 
+# Show the Employees who are Sales Agents.
+
+SELECT *
+FROM employees
+WHERE title LIKE 'Sales%Agent'
+;
+
+
+# Find a unique/distinct list of billing countries from the Invoice table.
+
+
