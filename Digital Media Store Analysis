@@ -1,0 +1,40 @@
+# The following analysis was used on a dataset called chinook (https://cdn.fs.teachablecdn.com/dRmwOLQsS22FVFbXfh3x), which represents a 
+# digital media store and includes tables for artists, albums, media tracks, invoices, and customers.
+
+# Show Customers (their full names, customer ID, and country) who are not in the US.
+
+SELECT firstname, lastname, customerid, country
+FROM chinook.customers
+WHERE country <> 'USA'
+;
+
+
+# How many customers are in each country that is not the US?
+
+SELECT country, COUNT(country)
+FROM chinook.customers
+WHERE country <> 'USA'
+GROUP BY country
+;
+
+
+# Show only the Customers from Brazil.
+
+SELECT *
+FROM chinook.customers
+WHERE country = 'Brazil'
+;
+
+
+# Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date 
+# of the invoice, and billing country.
+
+SELECT c.firstname, c.lastname, i.invoiceid, i.invoicedate, i.billingcountry
+FROM invoices i
+LEFT JOIN customers c
+ON i.customerid = c.CustomerId
+WHERE i.billingcountry = 'Brazil'
+;
+
+
+# 
