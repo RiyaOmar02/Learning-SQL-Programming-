@@ -112,4 +112,19 @@ JOIN artists
 ;
 
 
-# 
+# Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+
+SELECT tracks.name AS 'Track', albums.title AS 'Album', genres.name AS 'Genre', media.name AS 'Media Type'
+FROM tracks
+LEFT JOIN albums
+    ON tracks.albumid = albums.AlbumId
+LEFT JOIN genres
+    ON tracks.genreid = genres.GenreId
+LEFT JOIN media_types media
+    ON tracks.mediatypeid = media.mediatypeid
+;
+
+
+# Show the total sales made by each sales agent.
+
+
