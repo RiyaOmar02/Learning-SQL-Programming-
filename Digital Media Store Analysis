@@ -92,4 +92,24 @@ WHERE invoicedate LIKE '2009%'
 
 # Write a query that includes the purchased track name with each invoice line ID.
 
+SELECT t.name, items.invoicelineid
+FROM invoice_items items
+JOIN tracks t
+ON items.trackid = t.trackid
+;
 
+
+# Write a query that includes the purchased track name AND artist name with each invoice line ID.
+
+SELECT t.name AS 'Track', artists.name AS 'Artist', items.invoicelineid
+FROM invoice_items items
+LEFT JOIN tracks t
+    ON items.trackid = t.trackid
+JOIN albums
+    ON t.albumid = albums.albumid
+JOIN artists
+    ON artists.artistid = albums.artistid
+;
+
+
+# 
