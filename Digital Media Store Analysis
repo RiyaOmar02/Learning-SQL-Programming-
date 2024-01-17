@@ -164,3 +164,39 @@ GROUP BY c.supportrepid
 ORDER BY total_sales DESC
 LIMIT 1
 ;
+
+
+# Which tracks are the most popular?
+# Note: in seeking an to answer my question, most track where bought only once or twice, so I narrowed 
+# the list to those tracks that were bought more than once. 
+
+WITH counttracks AS (
+    SELECT trackid, COUNT(trackid) AS track_count
+    FROM invoice_items
+    GROUP BY trackid
+    )
+SELECT i.trackid, t.name, track_count
+FROM counttracks i
+LEFT JOIN tracks t
+ON i.trackid = t.trackid
+WHERE track_count > 1
+ORDER BY t.name
+;
+
+# This list still proved too long to be useful, so I counted how many songs fit into this category. 
+
+WITH counttracks AS (
+    SELECT trackid, COUNT(trackid) AS track_count
+    FROM invoice_items
+    GROUP BY trackid
+    )
+SELECT COUNT(i.trackid)
+FROM counttracks i
+LEFT JOIN tracks t
+ON i.trackid = t.trackid
+WHERE track_count > 1
+ORDER BY t.name
+;
+
+
+# 
