@@ -1,6 +1,15 @@
 # The following analysis was used on a dataset called chinook (https://cdn.fs.teachablecdn.com/dRmwOLQsS22FVFbXfh3x), which represents a 
 # digital media store and includes tables for artists, albums, media tracks, invoices, and customers.
 
+# First, I wanted to get familaar with the tables in this database before analyzing the data.
+
+SELECT name
+FROM sqlite_master
+WHERE type = 'table'
+
+
+# Once I was familiar with the databases, I began analysis:
+
 # Show Customers (their full names, customer ID, and country) who are not in the US.
 
 SELECT firstname, lastname, customerid, country
