@@ -46,6 +46,15 @@ WHERE i.billingcountry = 'Brazil'
 ;
 
 
+# Show the average spent per country in descending order.
+
+SELECT billingcountry, ROUND(AVG(total) , 2 ) AS 'average_spent'
+FROM invoices
+GROUP BY billingcountry
+ORDER BY average_spent' DESC
+;
+
+
 # Show the Employees who are Sales Agents.
 
 SELECT *
@@ -96,6 +105,15 @@ WHERE invoicedate LIKE '2009%'
 SELECT SUM(total)
 FROM invoices
 WHERE invoicedate LIKE '2009%'
+;
+
+
+# Show the total earnings for each year ordered by descending earnings.
+
+SELECT strftime('%Y', invoicedate) AS year, ROUND(SUM(total) , 2) AS year_total
+FROM invoices
+GROUP BY year
+ORDER BY year_total DESC
 ;
 
 
