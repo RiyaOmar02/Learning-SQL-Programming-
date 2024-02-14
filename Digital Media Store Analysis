@@ -1,7 +1,7 @@
 # The following analysis was used on a dataset called chinook (https://cdn.fs.teachablecdn.com/dRmwOLQsS22FVFbXfh3x), which represents a 
 # digital media store and includes tables for artists, albums, media tracks, invoices, and customers.
 
-# First, I wanted to get familaar with the tables in this database before analyzing the data.
+# First, I wanted to get familiar with the tables in this database before analyzing the data.
 
 SELECT name
 FROM sqlite_master
