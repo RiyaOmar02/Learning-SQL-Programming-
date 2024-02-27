@@ -108,3 +108,46 @@ FROM people
 WHERE state_code = 'CO'
 ORDER BY team ASC, shirt_or_hat ASC, last_name DESC
 ;
+
+
+# How many people in each state earned each score?
+
+SELECT state_code, quiz_points, COUNT(quiz_points)
+FROM people
+GROUP BY state_code, quiz_points
+;
+
+
+# How many participants are there from each region of the United States?
+
+SELECT states.division, COUNT(*)
+FROM people
+LEFT JOIN states 
+ON people.state_code = states.state_abbrev
+GROUP BY states.division
+ORDER BY states.division
+;
+
+
+# How many team members are in each region?
+
+SELECT s.region, p.team, COUNT(p.team)
+FROM people p
+LEFT JOIN states s
+ON p.state_code = s.state_abbrev
+GROUP BY s.region, p.team
+ORDER BY s.region, p.team
+;
+
+
+# Are there any states that did not have participants in the quiz competition?
+
+SELECT DISTINCT(people.state_code), states.state_abbrev
+FROM states
+LEFT JOIN people
+ON people.state_code = states.state_abbrev   
+ORDER BY people.state_code
+;
+
+
+
