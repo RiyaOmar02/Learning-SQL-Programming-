@@ -208,3 +208,43 @@ ORDER BY AVG(p.quiz_points) DESC
 ;
 
 
+# Add three new participants to the quiz competition: George White, Jenn Smith, and Carol. 
+
+INSERT INTO people 
+    (first_name, last_name)
+VALUES
+    ('George', 'White'),
+    ('Jenn', 'Smith'),
+    ('Carol', NULL)
+    ;
+
+
+# Remove the participants who joined after the deadline. 
+
+DELETE FROM people
+WHERE id_number IN (1004, 1005, 1006)
+;
+
+
+# Identify any quiz points with NULL values and delete them. 
+
+SELECT *
+FROM people
+WHERE quiz_points IS NULL
+;
+
+DELETE FROM people
+WHERE quiz_points IS NULL
+;
+
+
+# Create a SQL statement that shows the id_number and other confirmatory information for Alice, from Florida, who is a member of the Cobras.
+
+SELECT people.id_number, people.first_name, people.state_code, people.team
+FROM people
+LEFT JOIN states
+ON people.state_code = states.state_abbrev 
+WHERE people.first_name = 'Alice'
+    AND states.state_name = 'Florida'
+    AND team LIKE '%Cobras%'
+;
