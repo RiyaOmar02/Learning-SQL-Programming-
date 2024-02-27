@@ -1,0 +1,110 @@
+# The following analysis utilizes data from the database at this link: https://github.com/LinkedInLearning/learningsql-2875059.git
+# The data quantifies quiz competition information for 1000 participants across the United States.
+
+
+# Analysis
+
+
+# How many entries are in each table?
+
+SELECT COUNT(*)
+FROM people
+;
+
+SELECT COUNT(*)
+FROM states
+;
+
+
+# What is the average age of the participants?
+
+SELECT AVG(age)
+FROM people
+;
+
+
+# How many participants signed up in each state?
+
+SELECT state_code, COUNT(*)
+FROM people
+GROUP BY state_code
+ORDER BY COUNT(*) DESC
+;
+
+
+# Provide all the participants who requested a hat.
+
+SELECT first_name, last_name
+FROM people
+WHERE shirt_or_hat = 'hat'
+;
+
+
+# How many participants requested each type of gift?
+
+SELECT shirt_or_hat, COUNT(shirt_or_hat)
+FROM people
+GROUP BY shirt_or_hat
+;
+
+
+# Provide a list of all the participants in California who requested a shirt.
+
+SELECT first_name, last_name
+FROM people
+WHERE state_code = 'CA' 
+    AND shirt_or_hat = 'shirt'
+;
+
+
+# Provide a list of all the participants who requested a hat in the West Coast states. Include their state in the list.
+
+SELECT state_code, first_name, last_name
+FROM people
+WHERE state_code IN ('WA', 'OR', 'CA')
+    AND shirt_or_hat = 'hat'
+;
+
+
+# How many different teams participated in the quiz competition?
+
+SELECT DISTINCT team, COUNT(team)
+FROM people
+GROUP BY team
+;
+
+
+# Provide all the records for participants whose state starts with an A.
+
+SELECT *
+FROM people
+WHERE state_code LIKE 'A%'
+;
+
+
+# Provide a list of participants whose last names start with M for the registration team to use at check-in. 
+
+SELECT last_name, first_name
+FROM people
+WHERE last_name LIKE 'M%'
+ORDER BY last_name, first_name
+;
+
+
+# Which participant has the longest name?
+
+SELECT first_name, last_name, LENGTH(CONCAT(first_name, ' ', last_name)) AS full_name
+FROM people
+ORDER BY full_name DESC
+;
+ 
+
+# Create a list of participants in Colorado. Organize the lsit so that participants are sorted by their 
+# team name, the gift they want, and by their last name. Use descending order for the last names and 
+# ascending order for the other sort fields.
+
+SELECT team, shirt_or_hat, first_name, last_name
+FROM people
+WHERE state_code = 'CO'
+ORDER BY team ASC, shirt_or_hat ASC, last_name DESC
+;
