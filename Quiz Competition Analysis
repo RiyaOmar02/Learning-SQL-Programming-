@@ -150,4 +150,61 @@ ORDER BY people.state_code
 ;
 
 
+# What was the maximum and minimum quiz points from the competition, and what is the difference in these values?
+
+SELECT MAX(quiz_points) AS Max, MIN(quiz_points) AS Min, MAX(quiz_points) - MIN(quiz_points) AS Difference
+FROM people
+;
+
+
+# Which participants scored 80 or more points in the competition?
+
+SELECT first_name, last_name, quiz_points
+FROM people
+WHERE quiz_points >= 80
+ORDER BY quiz_points DESC
+;
+
+
+# What was the average number of points earned by each team?
+
+SELECT team, ROUND(AVG(quiz_points) , 2) AS avg_points
+FROM people
+GROUP BY team
+ORDER BY avg_points DESC
+;
+
+
+# Provide all records for participants from Minnesota.
+
+SELECT *
+FROM people
+WHERE state_code = (
+    SELECT state_abbrev
+    FROM states
+    WHERE state_name = 'Minnesota'
+    )
+ORDER BY last_name, first_name
+;
+
+
+# How many people signed up on each day of January?
+
+SELECT signup, COUNT(*)
+FROM people
+GROUP BY signup
+;
+
+
+# Write a query that returns the maximum and average scores for each state, along with the 
+# state name, sorted from highest to lowest average score.
+
+SELECT s.state_name AS state, MAX(p.quiz_points) AS maxpoints, ROUND(AVG(p.quiz_points) , 2) AS avgpoints
+FROM people p
+LEFT JOIN states s
+ON p.state_code = s.state_abbrev
+GROUP BY p.state_code
+ORDER BY AVG(p.quiz_points) DESC
+;
+
 
