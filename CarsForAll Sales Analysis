@@ -1,0 +1,250 @@
+# The following analysis utilized data from the following Github codespace: https://github.com/LinkedInLearning/level-up-advanced-sql-4311094/codespaces
+
+
+# Create a list of employees and their immediate mamangers.
+
+SELECT e.firstname AS EmployeeFirstName,
+e.lastname AS EmployeeLastName,
+e.title AS Title,
+manager.firstname AS ManagerFirstName,
+manager.lastname AS ManagerLastName
+FROM employee e
+JOIN employee manager
+ON e.managerid = manager.employeeid
+;
+
+
+# Find salespeople who have zero sales.
+
+SELECT e.employeeid, 
+e.firstname, 
+e.lastname, 
+e.title, 
+s.salesid
+FROM employee e 
+LEFT JOIN sales s
+ON e.employeeid = s.employeeid 
+WHERE e.title = 'Sales Person'
+AND s.salesid IS NULL
+GROUP BY e.employeeid 
+;
+
+
+# List all customers and their sales, even if some data is missing.
+
+SELECT c.firstname,
+c.lastname,
+s.salesid, 
+s.salesamount, 
+s.solddate 
+FROM customer c
+FULL OUTER JOIN sales s
+ON c.customerid = s.customerid 
+ORDER BY s.solddate DESC
+;
+
+
+# How many cars have been sold per employee?
+
+SELECT e.employeeid,
+e.firstname,
+e.lastname, 
+COUNT(s.salesid) AS CarsSold
+FROM employee e
+INNER JOIN sales s 
+ON e.employeeid = s.employeeid 
+GROUP BY e.employeeid  
+ORDER BY CarsSold DESC 
+;
+
+
+# Find the least and most expensive car sold by each employee this year.
+
+SELECT e.employeeid,
+e.firstname,
+e.lastname, 
+MIN(s.salesamount) AS MinimumSale,
+MAX(s.salesamount) AS MaximumSale
+FROM sales s
+INNER JOIN employee e 
+ON e.employeeid = s.employeeid 
+WHERE YEAR(s.solddate) = YEAR(CURRENT_DATE)
+GROUP BY e.employeeid, e.firstname, e.lastname 
+ORDER BY e.firstname, e.lastname DESC 
+;
+
+
+# Display a report for employees who have sold more than five cars this year.
+
+SELECT e.employeeid,
+e.firstname,
+e.lastname,
+COUNT(s.salesid) AS SalesCount
+FROM sales s
+INNER JOIN employee e 
+ON e.employeeid = s.employeeid 
+WHERE YEAR(s.solddate) = YEAR(CURRENT_DATE)
+GROUP BY e.employeeid, e.firstname, e.lastname 
+HAVING COUNT(s.salesid) > 5
+ORDER BY e.firstname, e.lastname DESC 
+;
+
+
+# Summarize total sales per year.
+
+WITH year AS(
+    SELECT strftime('%Y', solddate) AS SalesYear,
+    salesamount
+    FROM sales
+)
+
+SELECT salesyear, 
+ROUND(SUM(salesamount),2) AS AnnualSales
+FROM year
+GROUP BY salesyear
+ORDER BY salesyear, SUM(salesamount)
+;
+
+
+# Display the number of sales for each employee by month for 2021.
+
+WITH month AS(
+    SELECT DISTINCT strftime('%m', solddate) AS salemonth,
+    solddate 
+    FROM sales
+    WHERE solddate LIKE '2021%'
+)
+
+SELECT e.employeeid, 
+e.firstname,
+e.lastname ,
+SUM(CASE WHEN m.salemonth = '01'
+      THEN salesAmount 
+      END) AS JanSales,
+  SUM(CASE 
+      WHEN m.salemonth = '02'
+      THEN salesAmount 
+      END) AS FebSales,
+  SUM(CASE 
+      WHEN m.salemonth = '03'
+      THEN salesAmount 
+      END) AS MarSales,
+  SUM(CASE 
+      WHEN m.salemonth = '04' 
+      THEN salesAmount 
+      END) AS AprSales,
+  SUM(CASE 
+      WHEN m.salemonth = '05' 
+      THEN salesAmount 
+      END) AS MaySales,
+  SUM(CASE 
+      WHEN m.salemonth = '06' 
+      THEN salesAmount 
+      END) AS JunSales,
+  SUM(CASE 
+      WHEN m.salemonth = '07' 
+      THEN salesAmount 
+      END) AS JulSales,
+  SUM(CASE 
+      WHEN m.salemonth = '08' 
+      THEN salesAmount 
+      END) AS AugSales,
+  SUM(CASE 
+      WHEN m.salemonth = '09' 
+      THEN salesAmount 
+      END) AS SepSales,
+  SUM(CASE 
+      WHEN m.salemonth = '10' 
+      THEN salesAmount 
+      END) AS OctSales,
+  SUM(CASE 
+      WHEN m.salemonth = '11' 
+      THEN salesAmount 
+      END) AS NovSales,
+  SUM(CASE 
+      WHEN m.salemonth = '12' 
+      THEN salesAmount 
+      END) AS DecSales
+
+FROM month m 
+RIGHT JOIN sales s 
+ON m.solddate = s.solddate 
+RIGHT JOIN employee e 
+ON e.employeeid = s.employeeid 
+GROUP BY e.firstname, e.lastname 
+ORDER BY e.firstname, e.lastName
+;
+
+
+# Find all sales where the car purchased was electric.
+
+SELECT s.salesid, 
+s.salesamount, 
+s.solddate, 
+s.inventoryid, 
+i.colour, 
+i.year 
+FROM sales s 
+LEFT JOIN inventory i
+ON s.inventoryid = i.inventoryid 
+WHERE i.modelid IN 
+    (SELECT modelid 
+    FROM model
+    WHERE enginetype = 'Electric'
+    )
+;
+
+
+# Get a list of sales people and rank the car models they've sold most of.
+
+SELECT e.firstname, 
+e.lastname, 
+m.model,
+COUNT(m.model) AS NumberSold,
+RANK() OVER (
+    PARTITION BY s.employeeid
+    ORDER BY COUNT(m.model) DESC
+    ) 
+    AS Rank
+FROM sales s 
+INNER JOIN employee e  
+ON e.employeeid = s.employeeid 
+INNER JOIN inventory i 
+ON i.inventoryid = s.inventoryid 
+INNER JOIN model m 
+ON m.modelid = i.modelid  
+GROUP BY e.firstname, e.lastName, m.model
+;
+
+
+# Generate a sales report showing total sales per month and an annual running total.
+
+WITH temp AS(
+SELECT 
+strftime('%Y', solddate) AS soldyear,
+strftime('%m', solddate) AS soldmonth,
+SUM(salesamount) AS salesamount
+FROM sales
+GROUP BY soldyear, soldmonth
+)
+
+SELECT soldyear, soldmonth, salesamount, 
+    SUM(salesamount) OVER(
+        PARTITION BY soldyear
+        ORDER BY soldyear, soldmonth)
+        AS AnnualSalesRunningTotal
+FROM temp
+ORDER BY soldyear, soldmonth
+;
+
+
+# Create a report showing the number of cars sold this month and last month. 
+
+SELECT strftime('%Y-%m', soldDate) AS MonthSold,
+  COUNT(*) AS CarsSold,
+  LAG (COUNT(*), 1, 0 ) OVER calMonth AS LastMonthCarsSold
+FROM sales
+GROUP BY strftime('%Y-%m', soldDate)
+WINDOW calMonth AS (ORDER BY strftime('%Y-%m', soldDate))
+ORDER BY strftime('%Y-%m', soldDate)
+;
